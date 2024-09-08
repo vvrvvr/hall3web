@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 53f3cae1abc12454297928eb511313a3
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - referenceAvatar: {fileID: 9000000, guid: 6d04967b2403b0947a66ac519789eaaa, type: 3}
+  - referenceFBX: {fileID: 919132149155446097, guid: 6d04967b2403b0947a66ac519789eaaa,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
