@@ -14,6 +14,8 @@ namespace StarterAssets
 #endif
     public class ThirdPersonController : MonoBehaviour
     {
+        public bool _jumpTriggered;
+        
         
         public CameraSwitcher cameraSwitcher;
         [Header("Player")] [Tooltip("Move speed of the character in m/s")]
@@ -189,12 +191,19 @@ namespace StarterAssets
 
         private void GroundedCheck()
         {
+            bool wasGrounded = Grounded;
             // set sphere position, with offset
             Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset,
                 transform.position.z);
             Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers,
                 QueryTriggerInteraction.Ignore);
-
+            
+            if (wasGrounded && !Grounded) // Персонаж оторвался земли
+            {
+                _jumpTriggered = true; 
+               
+            }
+            
             // update animator if using character
             if (_hasAnimator)
             {
@@ -232,6 +241,7 @@ namespace StarterAssets
                 if (IsFlying)
                 {
                     IsFlying = false; // выключаем режим полёта
+                    _jumpTriggered = false;
                     cameraSwitcher.SwitchCamera(1);
                     _verticalVelocity = 0f; // сбрасываем вертикальную скорость
                 }
@@ -354,10 +364,26 @@ namespace StarterAssets
 
                 // Выключаем режим полета при касании земли
                 IsFlying = false;
+                _jumpTriggered = false;
+                _flightDelayTimer = 0;
                 cameraSwitcher.SwitchCamera(1);
             }
             else
             {
+                if (_jumpTriggered && !IsFlying)
+                {
+                    _flightDelayTimer += Time.deltaTime;
+
+                    if (_flightDelayTimer >= FlightDelay) // Если таймер полёта превысил задержку
+                    {
+                        IsFlying = true;
+                        cameraSwitcher.SwitchCamera(2);
+                        _flightVelocity = _controller.velocity;
+                        _jumpTriggered = false;
+                    }
+                }
+                
+                
                 // Таймер падения
                 if (_fallTimeoutDelta >= 0.0f)
                 {
