@@ -15,9 +15,11 @@ namespace StarterAssets
     public class ThirdPersonController : MonoBehaviour
     {
         public bool _jumpTriggered;
-        
-        
+        public bool canFly = false;
+        public GameObject trial1;
+        public GameObject trail2;
         public CameraSwitcher cameraSwitcher;
+
         [Header("Player")] [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 2.0f;
 
@@ -139,6 +141,8 @@ namespace StarterAssets
 
         private void Awake()
         {
+            trial1.SetActive(false);
+            trail2.SetActive(false);
             // get a reference to our main camera
             if (_mainCamera == null)
             {
@@ -197,13 +201,12 @@ namespace StarterAssets
                 transform.position.z);
             Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers,
                 QueryTriggerInteraction.Ignore);
-            
+
             if (wasGrounded && !Grounded) // Персонаж оторвался земли
             {
-                _jumpTriggered = true; 
-               
+                _jumpTriggered = true;
             }
-            
+
             // update animator if using character
             if (_hasAnimator)
             {
@@ -238,19 +241,27 @@ namespace StarterAssets
             if (_input.jump)
             {
                 _input.jump = false; // сбрасываем флаг нажатия, чтобы избежать многократного срабатывания
-                if (IsFlying)
+
+                if (canFly)
                 {
-                    IsFlying = false; // выключаем режим полёта
-                    _jumpTriggered = false;
-                    cameraSwitcher.SwitchCamera(1);
-                    _verticalVelocity = 0f; // сбрасываем вертикальную скорость
-                }
-                else
-                {
-                    IsFlying = true; // включаем режим полёта
-                    cameraSwitcher.SwitchCamera(2);
-                    // Задаем начальную скорость полета, если это необходимо
-                    _flightVelocity = _controller.velocity; // Используем текущую горизонтальную скорость
+                    if (IsFlying)
+                    {
+                        IsFlying = false;
+                        trial1.SetActive(false);
+                        trail2.SetActive(false);// выключаем режим полёта
+                        _jumpTriggered = false;
+                        cameraSwitcher.SwitchCamera(1);
+                        _verticalVelocity = 0f; // сбрасываем вертикальную скорость
+                    }
+                    else
+                    {
+                        IsFlying = true;
+                        trial1.SetActive(true);
+                        trail2.SetActive(true);// включаем режим полёта
+                        cameraSwitcher.SwitchCamera(2);
+                        // Задаем начальную скорость полета, если это необходимо
+                        _flightVelocity = _controller.velocity; // Используем текущую горизонтальную скорость
+                    }
                 }
             }
 
@@ -276,7 +287,8 @@ namespace StarterAssets
                 // Переназначаем inputDirection, добавляя компонент движения по Y для полёта
                 inputDirection = (cameraForward * _input.move.y + cameraRight * _input.move.x).normalized;
 
-                float targetSpeed = _input.sprint ? FlightSprintSpeed : FlightSpeed;
+                // Используем FlightAcceleration для ускорения при спринте
+                float targetSpeed = _input.sprint ? FlightSpeed + FlightAcceleration : FlightSpeed;
                 Vector3 targetVelocity = inputDirection * targetSpeed;
 
                 // Применяем инерцию к текущей скорости полета
@@ -364,6 +376,8 @@ namespace StarterAssets
 
                 // Выключаем режим полета при касании земли
                 IsFlying = false;
+                trial1.SetActive(false);
+                trail2.SetActive(false);
                 _jumpTriggered = false;
                 _flightDelayTimer = 0;
                 cameraSwitcher.SwitchCamera(1);
@@ -376,14 +390,19 @@ namespace StarterAssets
 
                     if (_flightDelayTimer >= FlightDelay) // Если таймер полёта превысил задержку
                     {
-                        IsFlying = true;
-                        cameraSwitcher.SwitchCamera(2);
-                        _flightVelocity = _controller.velocity;
+                        if (canFly)
+                        {
+                            IsFlying = true;
+                            trial1.SetActive(true);
+                            trail2.SetActive(true);
+                            cameraSwitcher.SwitchCamera(2);
+                            _flightVelocity = _controller.velocity;
+                        }
                         _jumpTriggered = false;
                     }
                 }
-                
-                
+
+
                 // Таймер падения
                 if (_fallTimeoutDelta >= 0.0f)
                 {
