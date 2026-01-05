@@ -16,13 +16,14 @@ namespace StarterAssets
     {
         public bool _jumpTriggered;
         public bool canFly = false;
-        public GameObject trial1;
-        public GameObject trail2;
+        public GameObject trial1; // Точка привязки для первого трейла (рука)
+        public GameObject trail2; // Точка привязки для второго трейла (рука)
+        public GameObject TrailPrefab; // Префаб с TrailRenderer компонентом
         public CameraSwitcher cameraSwitcher;
         
-        // Trail renderer components
-        private TrailRenderer _trail1Renderer;
-        private TrailRenderer _trail2Renderer;
+        // Текущие активные трейлы во время полета
+        private GameObject _currentTrail1Instance;
+        private GameObject _currentTrail2Instance;
 
         [Header("Player")] [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 2.0f;
@@ -145,28 +146,6 @@ namespace StarterAssets
 
         private void Awake()
         {
-            // Get TrailRenderer components
-            if (trial1 != null)
-            {
-                _trail1Renderer = trial1.GetComponent<TrailRenderer>();
-                if (_trail1Renderer == null)
-                {
-                    _trail1Renderer = trial1.GetComponentInChildren<TrailRenderer>();
-                }
-            }
-            
-            if (trail2 != null)
-            {
-                _trail2Renderer = trail2.GetComponent<TrailRenderer>();
-                if (_trail2Renderer == null)
-                {
-                    _trail2Renderer = trail2.GetComponentInChildren<TrailRenderer>();
-                }
-            }
-            
-            // Initially disable trails
-            SetTrailsActive(false);
-            
             // get a reference to our main camera
             if (_mainCamera == null)
             {
@@ -454,89 +433,81 @@ namespace StarterAssets
         }
 
         /// <summary>
-        /// Включает трейлы, не очищая старые следы (они останутся до истечения времени жизни)
+        /// Создает новые экземпляры префаба Trail в позициях рук для нового полета
         /// </summary>
         private void EnableTrails()
         {
-            if (_trail1Renderer != null)
+            if (TrailPrefab == null)
             {
-                // Убеждаемся, что GameObject активен
-                if (trial1 != null && !trial1.activeSelf)
-                {
-                    trial1.SetActive(true);
-                }
-                // НЕ очищаем старые следы - они должны оставаться до истечения времени жизни
-                _trail1Renderer.emitting = true; // Включаем эмиссию новых следов
-            }
-            else if (trial1 != null)
-            {
-                trial1.SetActive(true);
+                Debug.LogWarning("TrailPrefab не назначен!");
+                return;
             }
             
-            if (_trail2Renderer != null)
+            // Создаем новый экземпляр трейла для первой руки
+            if (trial1 != null)
             {
-                // Убеждаемся, что GameObject активен
-                if (trail2 != null && !trail2.activeSelf)
-                {
-                    trail2.SetActive(true);
-                }
-                // НЕ очищаем старые следы - они должны оставаться до истечения времени жизни
-                _trail2Renderer.emitting = true; // Включаем эмиссию новых следов
+                _currentTrail1Instance = Instantiate(TrailPrefab, trial1.transform);
+                _currentTrail1Instance.transform.localPosition = Vector3.zero;
+                _currentTrail1Instance.transform.localRotation = Quaternion.identity;
+                _currentTrail1Instance.transform.localScale = Vector3.one;
             }
-            else if (trail2 != null)
+            
+            // Создаем новый экземпляр трейла для второй руки
+            if (trail2 != null)
             {
-                trail2.SetActive(true);
+                _currentTrail2Instance = Instantiate(TrailPrefab, trail2.transform);
+                _currentTrail2Instance.transform.localPosition = Vector3.zero;
+                _currentTrail2Instance.transform.localRotation = Quaternion.identity;
+                _currentTrail2Instance.transform.localScale = Vector3.one;
             }
         }
         
         /// <summary>
-        /// Отключает эмиссию трейлов, но оставляет их видимыми для постепенного исчезновения
+        /// Отвязывает трейлы от рук, чтобы они остались в пространстве и постепенно исчезали
         /// </summary>
         private void DisableTrailsEmission()
         {
-            if (_trail1Renderer != null)
+            // Отвязываем первый трейл от руки, чтобы он остался в последней позиции
+            if (_currentTrail1Instance != null)
             {
-                // Убеждаемся, что GameObject активен для постепенного исчезновения трейла
-                if (trial1 != null && !trial1.activeSelf)
+                // Отключаем эмиссию, если есть TrailRenderer
+                TrailRenderer trailRenderer = _currentTrail1Instance.GetComponent<TrailRenderer>();
+                if (trailRenderer == null)
                 {
-                    trial1.SetActive(true);
+                    trailRenderer = _currentTrail1Instance.GetComponentInChildren<TrailRenderer>();
                 }
-                _trail1Renderer.emitting = false;
-            }
-            else if (trial1 != null)
-            {
-                trial1.SetActive(false);
+                
+                if (trailRenderer != null)
+                {
+                    trailRenderer.emitting = false;
+                }
+                
+                // Отвязываем от родителя, чтобы трейл остался в пространстве
+                _currentTrail1Instance.transform.SetParent(null);
+                _currentTrail1Instance = null;
             }
             
-            if (_trail2Renderer != null)
+            // Отвязываем второй трейл от руки, чтобы он остался в последней позиции
+            if (_currentTrail2Instance != null)
             {
-                // Убеждаемся, что GameObject активен для постепенного исчезновения трейла
-                if (trail2 != null && !trail2.activeSelf)
+                // Отключаем эмиссию, если есть TrailRenderer
+                TrailRenderer trailRenderer = _currentTrail2Instance.GetComponent<TrailRenderer>();
+                if (trailRenderer == null)
                 {
-                    trail2.SetActive(true);
+                    trailRenderer = _currentTrail2Instance.GetComponentInChildren<TrailRenderer>();
                 }
-                _trail2Renderer.emitting = false;
-            }
-            else if (trail2 != null)
-            {
-                trail2.SetActive(false);
+                
+                if (trailRenderer != null)
+                {
+                    trailRenderer.emitting = false;
+                }
+                
+                // Отвязываем от родителя, чтобы трейл остался в пространстве
+                _currentTrail2Instance.transform.SetParent(null);
+                _currentTrail2Instance = null;
             }
         }
         
-        /// <summary>
-        /// Полностью деактивирует трейлы (используется при инициализации)
-        /// </summary>
-        private void SetTrailsActive(bool active)
-        {
-            if (trial1 != null)
-            {
-                trial1.SetActive(active);
-            }
-            if (trail2 != null)
-            {
-                trail2.SetActive(active);
-            }
-        }
 
         private void OnDrawGizmosSelected()
         {
