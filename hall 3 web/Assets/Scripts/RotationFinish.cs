@@ -16,6 +16,33 @@ public class RotationFinish : MonoBehaviour
     public float waitSeconds = 2f;
     public float waitSeconds2 = 10f;// You can set this value in the Inspector
 
+    // Публичный метод для принудительного запуска разрушения комнаты (для пропуска интро)
+    public void ForceCompleteSequence()
+    {
+        if (isOnce)
+        {
+            isOnce = false;
+            _avatarMovementModifier.isRunComplete = true;
+            _avatarMovementModifier.ModifyAvatarValues();
+            axisRotation.isRotate = false;
+            axisRotation.StopRotation();
+            Debug.Log("run complete (skipped)");
+
+            // Disable kinematic on all rigidbodies in the array
+            foreach (Rigidbody rb in rigidbodies)
+            {
+                if (rb != null)
+                {
+                    rb.isKinematic = false;
+                }
+            }
+
+            // Start the coroutine to wait and then call AfterWaiting()
+            StartCoroutine(WaitAndExecute());
+            StartCoroutine(WaitAndExecute2());
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && isOnce)

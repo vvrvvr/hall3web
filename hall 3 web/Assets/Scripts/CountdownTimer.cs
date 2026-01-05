@@ -12,9 +12,21 @@ public class CountdownTimer : MonoBehaviour
     public string screenText;
     public AxisRotation axisRotation;
     public GameObject screenTextObj;
+    
+    [Header("Debug")]
+    public bool isSkip = false; // Пропустить интро-последовательность
+    
+    public RotationFinish rotationFinish; // Ссылка на RotationFinish для пропуска
 
     void Start()
     {
+        // Если включен пропуск, сразу выполняем все действия
+        if (isSkip)
+        {
+            SkipIntroSequence();
+            return;
+        }
+        
         // Инициализация таймера
         currentTime = timeToStart;
         timeText.text = screenText + " " + currentTime;
@@ -75,5 +87,33 @@ public class CountdownTimer : MonoBehaviour
         {
             Debug.LogWarning("Не назначен источник звука!");
         }
+    }
+    
+    // Метод для пропуска интро-последовательности
+    void SkipIntroSequence()
+    {
+        Debug.Log("Пропуск интро-последовательности");
+        
+        // Скрываем текст отсчёта
+        if (screenTextObj != null)
+        {
+            screenTextObj.SetActive(false);
+        }
+        
+        // Останавливаем вращение комнаты
+        if (axisRotation != null)
+        {
+            axisRotation.isRotate = false;
+            axisRotation.StopRotation();
+        }
+        
+        // Принудительно запускаем разрушение комнаты и активацию полёта
+        if (rotationFinish != null)
+        {
+            rotationFinish.ForceCompleteSequence();
+        }
+        
+        // Уничтожаем этот объект
+        Destroy(gameObject);
     }
 }
