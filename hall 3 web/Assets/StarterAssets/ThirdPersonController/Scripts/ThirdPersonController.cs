@@ -19,6 +19,10 @@ namespace StarterAssets
         public GameObject trial1;
         public GameObject trail2;
         public CameraSwitcher cameraSwitcher;
+        
+        // Trail renderer components
+        private TrailRenderer _trail1Renderer;
+        private TrailRenderer _trail2Renderer;
 
         [Header("Player")] [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 2.0f;
@@ -141,8 +145,28 @@ namespace StarterAssets
 
         private void Awake()
         {
-            trial1.SetActive(false);
-            trail2.SetActive(false);
+            // Get TrailRenderer components
+            if (trial1 != null)
+            {
+                _trail1Renderer = trial1.GetComponent<TrailRenderer>();
+                if (_trail1Renderer == null)
+                {
+                    _trail1Renderer = trial1.GetComponentInChildren<TrailRenderer>();
+                }
+            }
+            
+            if (trail2 != null)
+            {
+                _trail2Renderer = trail2.GetComponent<TrailRenderer>();
+                if (_trail2Renderer == null)
+                {
+                    _trail2Renderer = trail2.GetComponentInChildren<TrailRenderer>();
+                }
+            }
+            
+            // Initially disable trails
+            SetTrailsActive(false);
+            
             // get a reference to our main camera
             if (_mainCamera == null)
             {
@@ -247,8 +271,7 @@ namespace StarterAssets
                     if (IsFlying)
                     {
                         IsFlying = false;
-                        trial1.SetActive(false);
-                        trail2.SetActive(false);// выключаем режим полёта
+                        DisableTrailsEmission(); // Отключаем эмиссию, но трейлы продолжают исчезать постепенно
                         _jumpTriggered = false;
                         cameraSwitcher.SwitchCamera(1);
                         _verticalVelocity = 0f; // сбрасываем вертикальную скорость
@@ -256,8 +279,7 @@ namespace StarterAssets
                     else
                     {
                         IsFlying = true;
-                        trial1.SetActive(true);
-                        trail2.SetActive(true);// включаем режим полёта
+                        EnableTrails(); // Включаем трейлы и очищаем старые следы
                         cameraSwitcher.SwitchCamera(2);
                         // Задаем начальную скорость полета, если это необходимо
                         _flightVelocity = _controller.velocity; // Используем текущую горизонтальную скорость
@@ -376,8 +398,7 @@ namespace StarterAssets
 
                 // Выключаем режим полета при касании земли
                 IsFlying = false;
-                trial1.SetActive(false);
-                trail2.SetActive(false);
+                DisableTrailsEmission(); // Отключаем эмиссию, но трейлы продолжают исчезать постепенно
                 _jumpTriggered = false;
                 _flightDelayTimer = 0;
                 cameraSwitcher.SwitchCamera(1);
@@ -393,8 +414,7 @@ namespace StarterAssets
                         if (canFly)
                         {
                             IsFlying = true;
-                            trial1.SetActive(true);
-                            trail2.SetActive(true);
+                            EnableTrails(); // Включаем трейлы и очищаем старые следы
                             cameraSwitcher.SwitchCamera(2);
                             _flightVelocity = _controller.velocity;
                         }
@@ -431,6 +451,91 @@ namespace StarterAssets
             if (lfAngle < -360f) lfAngle += 360f;
             if (lfAngle > 360f) lfAngle -= 360f;
             return Mathf.Clamp(lfAngle, lfMin, lfMax);
+        }
+
+        /// <summary>
+        /// Включает трейлы, не очищая старые следы (они останутся до истечения времени жизни)
+        /// </summary>
+        private void EnableTrails()
+        {
+            if (_trail1Renderer != null)
+            {
+                // Убеждаемся, что GameObject активен
+                if (trial1 != null && !trial1.activeSelf)
+                {
+                    trial1.SetActive(true);
+                }
+                // НЕ очищаем старые следы - они должны оставаться до истечения времени жизни
+                _trail1Renderer.emitting = true; // Включаем эмиссию новых следов
+            }
+            else if (trial1 != null)
+            {
+                trial1.SetActive(true);
+            }
+            
+            if (_trail2Renderer != null)
+            {
+                // Убеждаемся, что GameObject активен
+                if (trail2 != null && !trail2.activeSelf)
+                {
+                    trail2.SetActive(true);
+                }
+                // НЕ очищаем старые следы - они должны оставаться до истечения времени жизни
+                _trail2Renderer.emitting = true; // Включаем эмиссию новых следов
+            }
+            else if (trail2 != null)
+            {
+                trail2.SetActive(true);
+            }
+        }
+        
+        /// <summary>
+        /// Отключает эмиссию трейлов, но оставляет их видимыми для постепенного исчезновения
+        /// </summary>
+        private void DisableTrailsEmission()
+        {
+            if (_trail1Renderer != null)
+            {
+                // Убеждаемся, что GameObject активен для постепенного исчезновения трейла
+                if (trial1 != null && !trial1.activeSelf)
+                {
+                    trial1.SetActive(true);
+                }
+                _trail1Renderer.emitting = false;
+            }
+            else if (trial1 != null)
+            {
+                trial1.SetActive(false);
+            }
+            
+            if (_trail2Renderer != null)
+            {
+                // Убеждаемся, что GameObject активен для постепенного исчезновения трейла
+                if (trail2 != null && !trail2.activeSelf)
+                {
+                    trail2.SetActive(true);
+                }
+                _trail2Renderer.emitting = false;
+            }
+            else if (trail2 != null)
+            {
+                trail2.SetActive(false);
+            }
+        }
+        
+        /// <summary>
+        /// Полностью деактивирует трейлы (используется при инициализации)
+        /// </summary>
+        private void SetTrailsActive(bool active)
+        {
+            if (trial1 != null)
+            {
+                trial1.SetActive(active);
+            }
+            if (trail2 != null)
+            {
+                trail2.SetActive(active);
+            }
         }
 
         private void OnDrawGizmosSelected()
