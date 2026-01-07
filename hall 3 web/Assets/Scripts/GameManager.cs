@@ -1,5 +1,6 @@
 using StarterAssets;
 using UnityEngine;
+using TMPro;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -37,6 +38,13 @@ public class GameManager : MonoBehaviour
     [Header("Настройки")]
     [Tooltip("Тег игрока (по умолчанию 'Player')")]
     public string playerTag = "Player";
+    
+    [Header("Экран завершения")]
+    [Tooltip("Canvas с CanvasFade для экрана завершения игры")]
+    public CanvasFade endGameCanvasFade;
+    
+    [Tooltip("Текстовое поле для отображения времени прохождения")]
+    public TextMeshProUGUI completionTimeText;
     
     private GameObject _player;
     private bool _gameEnded = false;
@@ -96,6 +104,19 @@ public class GameManager : MonoBehaviour
         if (_gameTimer != null)
         {
             _gameTimer.StopTimer();
+            
+            // Получаем отформатированное время и устанавливаем в текстовое поле
+            if (completionTimeText != null)
+            {
+                string timeString = _gameTimer.GetFormattedTime();
+                completionTimeText.text = $"Время прохождения: {timeString}";
+            }
+        }
+        
+        // Показываем экран завершения с фейдом
+        if (endGameCanvasFade != null)
+        {
+            endGameCanvasFade.FadeIn();
         }
     }
     

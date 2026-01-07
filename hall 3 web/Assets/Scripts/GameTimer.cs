@@ -57,6 +57,14 @@ public class GameTimer : MonoBehaviour
     }
     
     /// <summary>
+    /// Получить отформатированное время в формате MM.SS.MMM
+    /// </summary>
+    public string GetFormattedTime()
+    {
+        return FormatTime(_elapsedTime);
+    }
+    
+    /// <summary>
     /// Форматирование времени в формат MM.SS.MMM
     /// </summary>
     private string FormatTime(float timeInSeconds)
