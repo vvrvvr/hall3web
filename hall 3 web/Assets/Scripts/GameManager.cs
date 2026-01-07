@@ -40,6 +40,7 @@ public class GameManager : MonoBehaviour
     
     private GameObject _player;
     private bool _gameEnded = false;
+    private GameTimer _gameTimer;
     
     private void Awake()
     {
@@ -65,6 +66,16 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogWarning("GameManager: Игрок с тегом '" + playerTag + "' не найден!");
         }
+        
+        // Получаем или создаём GameTimer
+        _gameTimer = GetComponent<GameTimer>();
+        if (_gameTimer == null)
+        {
+            _gameTimer = gameObject.AddComponent<GameTimer>();
+        }
+        
+        // Запускаем таймер при старте игры
+        _gameTimer.StartTimer();
     }
     
     /// <summary>
@@ -80,6 +91,12 @@ public class GameManager : MonoBehaviour
         
         // Отключаем управление у игрока
         DisablePlayerInput();
+        
+        // Останавливаем таймер и выводим время
+        if (_gameTimer != null)
+        {
+            _gameTimer.StopTimer();
+        }
     }
     
     /// <summary>

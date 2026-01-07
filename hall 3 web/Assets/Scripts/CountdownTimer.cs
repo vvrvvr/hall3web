@@ -13,15 +13,19 @@ public class CountdownTimer : MonoBehaviour
     public AxisRotation axisRotation;
     public GameObject screenTextObj;
     
+    [Header("UI Fade")]
+    [Tooltip("Скрипт CanvasFade для фейда UI после интро")]
+    public CanvasFade canvasFade;
+    
     [Header("Debug")]
-    public bool isSkip = false; // Пропустить интро-последовательность
+    public bool isSkipIntro = false; // Пропустить интро-последовательность
     
     public RotationFinish rotationFinish; // Ссылка на RotationFinish для пропуска
 
     void Start()
     {
         // Если включен пропуск, сразу выполняем все действия
-        if (isSkip)
+        if (isSkipIntro)
         {
             SkipIntroSequence();
             return;
@@ -73,6 +77,13 @@ public class CountdownTimer : MonoBehaviour
     {
         axisRotation.RotateForward();
         screenTextObj.SetActive(false);
+        
+        // Запускаем фейд UI
+        if (canvasFade != null)
+        {
+            canvasFade.FadeIn();
+        }
+        
         Destroy(gameObject);
     }
 
@@ -111,6 +122,12 @@ public class CountdownTimer : MonoBehaviour
         if (rotationFinish != null)
         {
             rotationFinish.ForceCompleteSequence();
+        }
+        
+        // Запускаем фейд UI
+        if (canvasFade != null)
+        {
+            canvasFade.FadeIn();
         }
         
         // Уничтожаем этот объект
