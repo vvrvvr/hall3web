@@ -98,7 +98,11 @@ public class CoinManager : MonoBehaviour
         // Обновляем текст UI
         UpdateCoinText();
         
-        // Здесь в будущем будут события для UI и проверка завершения уровня
+        // Проверяем, все ли монетки собраны, и вызываем завершение игры
+        if (AreAllCoinsCollected() && GameManager.Instance != null)
+        {
+            GameManager.Instance.EndGame();
+        }
     }
     
     /// <summary>
