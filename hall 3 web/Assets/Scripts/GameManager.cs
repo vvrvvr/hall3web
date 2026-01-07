@@ -50,6 +50,15 @@ public class GameManager : MonoBehaviour
     private bool _gameEnded = false;
     private GameTimer _gameTimer;
     
+    private void Update()
+    {
+        // Если игра завершена и нажат Escape, скрываем экран завершения и возвращаем управление
+        if (_gameEnded && Input.GetKeyDown(KeyCode.Escape))
+        {
+            ResumeGame();
+        }
+    }
+    
     private void Awake()
     {
         // Убеждаемся, что есть только один экземпляр
@@ -125,8 +134,47 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void DisablePlayerInput()
     {
-        thirdPersonController.enabled = false;
-        playerAnimator.enabled = false;
+        if (thirdPersonController != null)
+        {
+            thirdPersonController.enabled = false;
+        }
+        if (playerAnimator != null)
+        {
+            playerAnimator.enabled = false;
+        }
+    }
+    
+    /// <summary>
+    /// Возврат управления игроку
+    /// </summary>
+    private void EnablePlayerInput()
+    {
+        if (thirdPersonController != null)
+        {
+            thirdPersonController.enabled = true;
+        }
+        if (playerAnimator != null)
+        {
+            playerAnimator.enabled = true;
+        }
+    }
+    
+    /// <summary>
+    /// Возобновление игры - скрывает экран завершения и возвращает управление
+    /// </summary>
+    private void ResumeGame()
+    {
+        // Скрываем экран завершения с фейдом
+        if (endGameCanvasFade != null)
+        {
+            endGameCanvasFade.FadeOut();
+        }
+        
+        // Возвращаем управление игроку
+        EnablePlayerInput();
+        
+        // Сбрасываем флаг завершения игры (чтобы можно было продолжить играть)
+        _gameEnded = false;
     }
 }
 
