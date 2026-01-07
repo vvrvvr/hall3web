@@ -1,3 +1,4 @@
+using StarterAssets;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -9,6 +10,8 @@ using UnityEngine.InputSystem;
 public class GameManager : MonoBehaviour
 {
     private static GameManager _instance;
+    public ThirdPersonController thirdPersonController;
+    public Animator playerAnimator;
     
     /// <summary>
     /// Единственный экземпляр GameManager (синглтон)
@@ -84,7 +87,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void DisablePlayerInput()
     {
-
+        thirdPersonController.enabled = false;
+        playerAnimator.enabled = false;
     }
 }
 
