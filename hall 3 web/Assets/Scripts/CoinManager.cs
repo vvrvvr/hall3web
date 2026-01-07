@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
 
 /// <summary>
 /// Менеджер монеток - синглтон, отслеживает все монетки на уровне и их подбор
@@ -29,6 +30,10 @@ public class CoinManager : MonoBehaviour
         }
     }
     
+    [Header("UI")]
+    [Tooltip("Текстовое поле для отображения счётчика монеток")]
+    public TextMeshProUGUI coinText;
+    
     private List<Coin> _allCoins = new List<Coin>();
     private int _collectedCount = 0;
     
@@ -51,6 +56,8 @@ public class CoinManager : MonoBehaviour
     {
         // Автоматически находим все монетки на сцене при старте
         RegisterAllCoins();
+        // Обновляем текст при старте
+        UpdateCoinText();
     }
     
     /// <summary>
@@ -88,7 +95,21 @@ public class CoinManager : MonoBehaviour
         
         Debug.Log($"CoinManager: Монетка собрана! Всего: {_collectedCount} / {_allCoins.Count}");
         
+        // Обновляем текст UI
+        UpdateCoinText();
+        
         // Здесь в будущем будут события для UI и проверка завершения уровня
+    }
+    
+    /// <summary>
+    /// Обновление текста счётчика монеток
+    /// </summary>
+    private void UpdateCoinText()
+    {
+        if (coinText != null)
+        {
+            coinText.text = $"Монеты: {GetCollectedCount()}/{GetTotalCount()}";
+        }
     }
     
     /// <summary>
