@@ -42,6 +42,10 @@ public class WorldTransformation : MonoBehaviour
     [Tooltip("Целевая плотность тумана (для режима Exponential Squared)")]
     public float fogTargetDensity = 0.01f;
     
+    [Header("Анимации")]
+    [Tooltip("Список объектов с компонентом RotationScript для отключения")]
+    public RotationScript[] rotationScriptObjects;
+    
     private void Start()
     {
         // Для тестирования можно включить трансформацию сразу
@@ -65,13 +69,14 @@ public class WorldTransformation : MonoBehaviour
         // Изменение тумана
         ChangeFog();
         
+        // Отключение анимаций
+        DisableRotationScripts();
+        
         // Здесь будут добавляться другие методы трансформации:
-        // - Отключение анимаций у объектов
         // - Изменение величин и параметров
         // и т.д.
         
         // Пример структуры (закомментировано):
-        // DisableAnimations();
         // ModifyValues();
     }
     
@@ -123,6 +128,27 @@ public class WorldTransformation : MonoBehaviour
         // Анимация плотности тумана от текущего значения к целевому
         DOTween.To(() => RenderSettings.fogDensity, x => RenderSettings.fogDensity = x, 
             fogTargetDensity, fogChangeDuration);
+    }
+    
+    /// <summary>
+    /// Отключение RotationScript у всех объектов из списка
+    /// </summary>
+    private void DisableRotationScripts()
+    {
+        if (rotationScriptObjects == null || rotationScriptObjects.Length == 0)
+        {
+            return;
+        }
+        
+        foreach (RotationScript rotationScript in rotationScriptObjects)
+        {
+            if (rotationScript != null)
+            {
+                rotationScript.enabled = false;
+            }
+        }
+        
+       // Debug.Log($"WorldTransformation: Отключено RotationScript у {rotationScriptObjects.Length} объектов");
     }
     
     // Здесь будут добавляться другие методы для конкретных трансформаций:
