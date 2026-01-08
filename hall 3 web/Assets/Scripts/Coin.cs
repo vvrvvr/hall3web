@@ -14,6 +14,10 @@ public class Coin : MonoBehaviour
     [Tooltip("Тег игрока (по умолчанию 'Player')")]
     public string playerTag = "Player";
     
+    [Header("Звук")]
+    [Tooltip("Звук подбора монетки")]
+    public AudioClip collectSound;
+    
     [Header("Анимация исчезновения")]
     [Tooltip("Время в секундах, за которое монетка уменьшится до нуля")]
     public float shrinkDuration = 0.5f;
@@ -46,6 +50,12 @@ public class Coin : MonoBehaviour
         if (_isCollected) return;
         
         _isCollected = true;
+        
+        // Проигрываем звук подбора
+        if (collectSound != null)
+        {
+            AudioSource.PlayClipAtPoint(collectSound, transform.position);
+        }
         
         // Спавним эффект подбора на месте монетки
         if (collectEffectPrefab != null)

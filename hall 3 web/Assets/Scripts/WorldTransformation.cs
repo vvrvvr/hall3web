@@ -46,6 +46,24 @@ public class WorldTransformation : MonoBehaviour
     [Tooltip("Список объектов с компонентом RotationScript для отключения")]
     public RotationScript[] rotationScriptObjects;
     
+    [Header("Аудио")]
+    [Tooltip("Длительность анимации изменения громкости в секундах")]
+    public float audioChangeDuration = 2f;
+    
+    [Tooltip("Первый AudioSource для изменения громкости")]
+    public AudioSource audioSource1;
+    
+    [Tooltip("Целевая громкость первого AudioSource (от 0 до 1)")]
+    [Range(0f, 1f)]
+    public float audio1TargetVolume = 1f;
+    
+    [Tooltip("Второй AudioSource для изменения громкости")]
+    public AudioSource audioSource2;
+    
+    [Tooltip("Целевая громкость второго AudioSource (от 0 до 1)")]
+    [Range(0f, 1f)]
+    public float audio2TargetVolume = 1f;
+    
     private void Start()
     {
         // Для тестирования можно включить трансформацию сразу
@@ -71,6 +89,9 @@ public class WorldTransformation : MonoBehaviour
         
         // Отключение анимаций
         DisableRotationScripts();
+        
+        // Изменение громкости аудио
+        ChangeAudioVolume();
         
         // Здесь будут добавляться другие методы трансформации:
         // - Изменение величин и параметров
@@ -149,6 +170,28 @@ public class WorldTransformation : MonoBehaviour
         }
         
        // Debug.Log($"WorldTransformation: Отключено RotationScript у {rotationScriptObjects.Length} объектов");
+    }
+    
+    /// <summary>
+    /// Изменение громкости AudioSource - анимирует громкость от текущего значения к целевому
+    /// </summary>
+    private void ChangeAudioVolume()
+    {
+        // Анимация громкости первого AudioSource
+        if (audioSource1 != null)
+        {
+            // Анимация громкости от текущего значения к целевому
+            DOTween.To(() => audioSource1.volume, x => audioSource1.volume = x, 
+                audio1TargetVolume, audioChangeDuration);
+        }
+        
+        // Анимация громкости второго AudioSource
+        if (audioSource2 != null)
+        {
+            // Анимация громкости от текущего значения к целевому
+            DOTween.To(() => audioSource2.volume, x => audioSource2.volume = x, 
+                audio2TargetVolume, audioChangeDuration);
+        }
     }
     
     // Здесь будут добавляться другие методы для конкретных трансформаций:
