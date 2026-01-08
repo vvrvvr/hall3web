@@ -46,6 +46,10 @@ public class GameManager : MonoBehaviour
     [Tooltip("Текстовое поле для отображения времени прохождения")]
     public TextMeshProUGUI completionTimeText;
     
+    [Header("Трансформация мира")]
+    [Tooltip("Скрипт для управления трансформацией мира после просмотра статистики")]
+    public WorldTransformation worldTransformation;
+    
     private GameObject _player;
     private bool _gameEnded = false;
     private GameTimer _gameTimer;
@@ -168,6 +172,12 @@ public class GameManager : MonoBehaviour
         if (endGameCanvasFade != null)
         {
             endGameCanvasFade.FadeOut();
+        }
+        
+        // Трансформируем мир
+        if (worldTransformation != null)
+        {
+            worldTransformation.TransformWorld();
         }
         
         // Возвращаем управление игроку
