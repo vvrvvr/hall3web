@@ -6,6 +6,10 @@ public class RotationFinish : MonoBehaviour
     private bool isOnce = true;
     public AvatarMovementModifier _avatarMovementModifier;
     public AxisRotation axisRotation;
+    
+    [Header("UI Fade")]
+    [Tooltip("Скрипт CanvasFade для фейда UI когда игроку разрешается летать")]
+    public CanvasFade canvasFade;
 
     // New public array to hold Rigidbody references
     public Rigidbody[] rigidbodies;
@@ -37,6 +41,12 @@ public class RotationFinish : MonoBehaviour
                 }
             }
 
+            // Запускаем фейд UI когда игроку разрешается летать и прыгать выше
+            if (canvasFade != null)
+            {
+                canvasFade.FadeIn();
+            }
+
             // Start the coroutine to wait and then call AfterWaiting()
             StartCoroutine(WaitAndExecute());
             StartCoroutine(WaitAndExecute2());
@@ -61,6 +71,12 @@ public class RotationFinish : MonoBehaviour
                 {
                     rb.isKinematic = false;
                 }
+            }
+
+            // Запускаем фейд UI когда игроку разрешается летать и прыгать выше
+            if (canvasFade != null)
+            {
+                canvasFade.FadeIn();
             }
 
             // Start the coroutine to wait and then call AfterWaiting()

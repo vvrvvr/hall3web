@@ -78,11 +78,7 @@ public class CountdownTimer : MonoBehaviour
         axisRotation.RotateForward();
         screenTextObj.SetActive(false);
         
-        // Запускаем фейд UI
-        if (canvasFade != null)
-        {
-            canvasFade.FadeIn();
-        }
+        // Фейд UI теперь запускается в RotationFinish когда игроку разрешается летать
         
         Destroy(gameObject);
     }
@@ -124,11 +120,7 @@ public class CountdownTimer : MonoBehaviour
             rotationFinish.ForceCompleteSequence();
         }
         
-        // Запускаем фейд UI
-        if (canvasFade != null)
-        {
-            canvasFade.FadeIn();
-        }
+        // Фейд UI теперь запускается в RotationFinish когда игроку разрешается летать
         
         // Уничтожаем этот объект
         Destroy(gameObject);
