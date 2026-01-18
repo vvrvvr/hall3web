@@ -112,7 +112,7 @@ public class CoinManager : MonoBehaviour
     {
         if (coinText != null)
         {
-            coinText.text = $"Монеты: {GetCollectedCount()}/{GetTotalCount()}";
+            coinText.text = $"Coins: {GetCollectedCount()}/{GetTotalCount()}";
         }
     }
     
@@ -140,6 +140,10 @@ public class CoinManager : MonoBehaviour
         return _collectedCount >= _allCoins.Count && _allCoins.Count > 0;
     }
 }
+
+
+
+
 
 
 

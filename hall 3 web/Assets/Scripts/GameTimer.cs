@@ -19,7 +19,7 @@ public class GameTimer : MonoBehaviour
         {
             _elapsedTime += Time.deltaTime;
             // Обновляем отображаемое время в Inspector
-            currentTimeDisplay = FormatTime(_elapsedTime);
+           // currentTimeDisplay = FormatTime(_elapsedTime);
         }
     }
     

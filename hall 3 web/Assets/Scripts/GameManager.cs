@@ -56,8 +56,8 @@ public class GameManager : MonoBehaviour
     
     private void Update()
     {
-        // Если игра завершена и нажат Escape, скрываем экран завершения и возвращаем управление
-        if (_gameEnded && Input.GetKeyDown(KeyCode.Escape))
+        // Если игра завершена и нажат Enter, скрываем экран завершения и возвращаем управление
+        if (_gameEnded && Input.GetKeyDown(KeyCode.Return))
         {
             ResumeGame();
         }
@@ -122,7 +122,7 @@ public class GameManager : MonoBehaviour
             if (completionTimeText != null)
             {
                 string timeString = _gameTimer.GetFormattedTime();
-                completionTimeText.text = $"Время прохождения: {timeString}";
+                completionTimeText.text = $"Completion time: {timeString}";
             }
         }
         
