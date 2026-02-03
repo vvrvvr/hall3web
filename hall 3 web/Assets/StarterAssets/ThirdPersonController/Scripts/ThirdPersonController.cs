@@ -37,6 +37,8 @@ namespace StarterAssets
         [Header("Flight Mode")] public bool IsFlying = false;
         public float FlightSpeed = 10.0f;
         public float FlightAcceleration = 5.0f;
+        [Tooltip("Extra upward bias when holding forward in flight (0 = no bias)")]
+        public float FlightForwardUpBias = 0.2f;
 
         [Header("Flight Mode Inertia")] [Tooltip("How quickly the character accelerates and decelerates in flight")]
         public float FlightInertia = 2.0f; // скорость инерции
@@ -286,7 +288,13 @@ namespace StarterAssets
                 Vector3 cameraRight = CinemachineCameraTarget.transform.right;
 
                 // Переназначаем inputDirection, добавляя компонент движения по Y для полёта
-                inputDirection = (cameraForward * _input.move.y + cameraRight * _input.move.x).normalized;
+                inputDirection = cameraForward * _input.move.y + cameraRight * _input.move.x;
+                if (_input.move.y > 0f && FlightForwardUpBias > 0f)
+                {
+                    // When holding forward, bias direction slightly upward for a more natural glide.
+                    inputDirection += Vector3.up * (FlightForwardUpBias * _input.move.y);
+                }
+                inputDirection = inputDirection.normalized;
 
                 // Используем FlightAcceleration для ускорения при спринте
                 float targetSpeed = _input.sprint ? FlightSpeed + FlightAcceleration : FlightSpeed;
